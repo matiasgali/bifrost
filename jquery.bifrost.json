@@ -1,0 +1,23 @@
+{
+  "name": "bifrost",
+  "version": "1.0.0.alpha",
+  "title": "Bifröst",
+  "description": "A jQuery Ajax transport that uses the iframe technique, allowing to asynchronously send files and data even if Ajax is not supported.",
+  "keywords": ["ajax", "hidden", "iframe", "asynchronous", "file", "data"],
+  "author": { "name": "Matías Gagliano" },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    {
+      "type": "GPLv3",
+      "url": "http://opensource.org/licenses/GPL-3.0"
+    }
+  ],
+  "homepage": "https://github.com/matiasgagliano/bifrost",
+  "docs": "https://github.com/matiasgagliano/bifrost",
+  "bugs": "https://github.com/matiasgagliano/bifrost/issues",
+  "demo": "https://matiasgagliano.github.io/bifrost",
+  "dependencies": { "jquery": ">=1.7" }
+}
