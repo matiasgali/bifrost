@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>Bifröst tests</title>
+  <link rel='stylesheet' href='http://code.jquery.com/qunit/qunit-1.14.0.css'>
+</head>
+<body>
+  <div id='qunit'></div>
+  <div id='qunit-fixture'></div>
+
+  <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
+  <script src='http://code.jquery.com/qunit/qunit-1.14.0.js'></script>
+  <script src='../js/jquery.bifrost.js'></script>
+  <script>
+    // Jaqen's address
+    var jaqen = 'http://localhost:9000';
+
+    QUnit.asyncTest('Parse text response.', function(assert) {
+      expect(1);
+      var text = 'Lorem ipsum dolor sit amet.';
+      $.ajax({
+        url: jaqen + '/query?_responseBody=' + text,
+        type: 'POST',
+        dataType: 'iframe text'
+      }).done(function(data){
+        assert.equal(data, text, 'Should parse "text".');
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed (text).');
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('Parse HTML response.', function(assert) {
+      expect(1);
+      var html = '<div><h1>Lorem ipsum</h1></div>';
+      $.ajax({
+        url: jaqen + '/query.html?' + $.param({_responseBody: html}),
+        type: 'POST',
+        dataType: 'iframe html'
+      }).done(function(data){
+        assert.ok(!!$(data).find('h1').length, 'Should parse "html".');
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed (html).');
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('Parse JSON response.', function(assert) {
+      expect(1);
+      var json = {'status': 'success', article: {id: '5'}};
+      $.ajax({
+        // Request as text so IE doesn't display a download dialog.
+        url: jaqen + '/query.txt?' + $.param(json),
+        type: 'POST',
+        dataType: 'iframe json'
+      }).done(function(data){
+        assert.deepEqual(data, json, 'Should parse "json".');
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed (json).');
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('Parse XML response.', function(assert) {
+      expect(1);
+      var xml = '<?xml version="1.0"?><article><title>Lorem Ipsum</title></article>';
+      $.ajax({
+        url: jaqen + '/query.xml?' + $.param({_responseBody: xml}),
+        type: 'POST',
+        dataType: 'iframe xml'
+      }).done(function(data){
+        assert.ok(!!$(data).find('title').length, 'Should parse "xml".');
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed (xml).');
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('Send data.', function( assert ) {
+      expect( 1 );
+
+      var article = {
+        title: 'Chronicles of Lorem Ipsum',
+        author: 'John Dow',
+        body: 'Lorem ipsum dolor sit amet.'
+      };
+
+      $.ajax({
+        // Request as text so IE doesn't display a download dialog.
+        url: jaqen + '/echo.txt',
+        type: 'POST',
+        dataType: 'iframe json',
+        data: article
+      }).done(function(data){
+        delete data['X-HTTP-Accept'];
+        delete data['X-Requested-With'];
+        assert.deepEqual(data, article, 'Should send data.');
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed.');
+        QUnit.start();
+      });
+    });
+  </script>
+</body>
