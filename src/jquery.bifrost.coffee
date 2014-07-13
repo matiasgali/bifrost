@@ -12,7 +12,7 @@
 
 # ______________________________
 #
-#              Vars
+#             Cache
 # ______________________________
 #
 $ = jQuery
@@ -51,7 +51,7 @@ class Bifrost
       # Catch exceptions thrown when trying to access cross-domain iframe contents.
       # completeCallback(status, statusText, responses, headers)
       try
-        response = iframe.contents().find('body').text()
+        response = iframe.contents() || $()
         completeCallback 200, 'success', iframe: response
       catch error
         console.log error
@@ -59,7 +59,8 @@ class Bifrost
 
       # Clean up
       form.remove()
-      iframe.remove()
+      iframe.detach()
+      iframe = null
 
     # Form
     form = @form = $('<form>').css('display', 'none')
@@ -115,11 +116,24 @@ class Bifrost
 $.ajaxTransport 'iframe', (options, originalOptions, jqXHR) ->
   new Bifrost(options, originalOptions, jqXHR) if options.async
 
-# Set convertes
-# (The keys format is 'source_type destination_type', single space in-between)
+
+# Set convertes (data type conversion strategies used by $.ajax).
+# The keys format is 'source_type destination_type', single space in-between.
+#
+# Notes:
+# - For JSON responses Content-Type has to be 'text/plain' or 'text/html'
+#   if the browser doesn't include 'application/json' in the Accept header,
+#   else IE will display a download dialog.
+#
+# - For XML responses Content-Type has to always be either 'application/xml'
+#   or 'text/xml' for IE to properly parse the response as XML.
+#
 $.ajaxSetup converters:
-  'iframe text':   true
-  'iframe json':   $.parseJSON
-  'iframe html':   true
-  'iframe xml':    $.parseXML
-  'iframe script': $.globalEval
+  'iframe text'  : (content) -> content.find('body').text()
+  'iframe json'  : (content) -> $.parseJSON content.find('body').text()
+  'iframe html'  : (content) -> content.find('body').html()
+  'iframe script': (content) -> $.globalEval content.find('body').text()
+  'iframe xml'   : (content) ->
+    xmlDoc = content[0]
+    return xmlDoc if $.isXMLDoc(xmlDoc)
+    $.parseXML xmlDoc.XMLDocument?.xml or content.find('body').html()

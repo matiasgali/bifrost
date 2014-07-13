@@ -54,7 +54,7 @@
       iframe.one('load', function() {
         var error, response;
         try {
-          response = iframe.contents().find('body').text();
+          response = iframe.contents() || $();
           completeCallback(200, 'success', {
             iframe: response
           });
@@ -66,7 +66,8 @@
           });
         }
         form.remove();
-        return iframe.remove();
+        iframe.detach();
+        return iframe = null;
       });
       form = this.form = $('<form>').css('display', 'none');
       form.prop({
@@ -143,11 +144,26 @@
 
   $.ajaxSetup({
     converters: {
-      'iframe text': true,
-      'iframe json': $.parseJSON,
-      'iframe html': true,
-      'iframe xml': $.parseXML,
-      'iframe script': $.globalEval
+      'iframe text': function(content) {
+        return content.find('body').text();
+      },
+      'iframe json': function(content) {
+        return $.parseJSON(content.find('body').text());
+      },
+      'iframe html': function(content) {
+        return content.find('body').html();
+      },
+      'iframe script': function(content) {
+        return $.globalEval(content.find('body').text());
+      },
+      'iframe xml': function(content) {
+        var xmlDoc, _ref;
+        xmlDoc = content[0];
+        if ($.isXMLDoc(xmlDoc)) {
+          return xmlDoc;
+        }
+        return $.parseXML(((_ref = xmlDoc.XMLDocument) != null ? _ref.xml : void 0) || content.find('body').html());
+      }
     }
   });
 
