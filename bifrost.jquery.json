@@ -1,9 +1,9 @@
 {
   "name": "bifrost",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "title": "Bifröst",
   "description": "A jQuery Ajax transport that uses the iframe technique, allowing to asynchronously send files and data even if FormData, the File API or XMLHttpRequest aren't supported.",
-  "keywords": ["ajax", "hidden", "iframe", "asynchronous", "file", "data"],
+  "keywords": ["ajax", "transport", "hidden", "iframe", "asynchronous", "file", "data"],
   "author": { "name": "Matías Gagliano" },
   "licenses": [
     {

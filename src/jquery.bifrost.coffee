@@ -1,5 +1,5 @@
 ###
- * jQuery Bifröst v1.0.0
+ * jQuery Bifröst v1.0.1
  * http://matiasgagliano.github.com/bifrost/
  *
  * Copyright 2014, Matías Gagliano.
