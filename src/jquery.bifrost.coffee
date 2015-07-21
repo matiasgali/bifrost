@@ -77,7 +77,11 @@ class Bifrost
         else if $.isArray(o[name]) then o[name].push value  # For checkboxes
         else o[name] = [ o[name], value ]
       data = o
-    data = $.extend {}, meta, data
+
+    if options.sendMeta is true
+      data = $.extend {}, meta, data
+    else
+      data = $.extend {}, data
 
     # Text inputs
     for name,value of data

@@ -92,7 +92,11 @@
         }
         data = o;
       }
-      data = $.extend({}, meta, data);
+      if(options.sendMeta == true) {
+        data = $.extend({}, meta, data);
+      } else {
+        data = $.extend({}, data);
+      }
       for (name in data) {
         value = data[name];
         form.append($('<input>').attr({

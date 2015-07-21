@@ -40,6 +40,12 @@ How to use it
 3.  Enjoy life! That's it, you are using a *hidden iframe* instead of
     *XMLHttpRequest*.
 
+4.  This plugin is capable of sending some additional meta data (which are normally
+    sent as headers) inside body and as part of multipart form data. This behaviour
+    is disabled per default because if your server side implementation is not 
+    flexible enough to accept those additional meta data (like Amazon S3 is not),
+    it will be rejected. If you need those set the additional `sendMeta` option
+    to `true` in setup.
 
 Testing
 -------
