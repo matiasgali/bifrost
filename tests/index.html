@@ -9,8 +9,8 @@
   <div id='qunit'></div>
   <div id='qunit-fixture'></div>
 
-  <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
-  <script src='http://code.jquery.com/qunit/qunit-1.14.0.js'></script>
+  <script src='http://code.jquery.com/jquery-1.11.3.min.js'></script>
+  <script src='http://code.jquery.com/qunit/qunit-1.18.0.js'></script>
   <script src='../js/jquery.bifrost.js'></script>
   <script>
     //
@@ -26,7 +26,7 @@
       var text = 'Lorem ipsum dolor sit amet.';
       $.ajax({
         url: jaqen + '/query?_responseBody=' + text,
-        type: 'POST',
+        method: 'POST',
         dataType: 'iframe text'
       }).done(function(data){
         assert.equal(data, text, 'Should parse "text".');
@@ -42,7 +42,7 @@
       var html = '<div><h1>Lorem ipsum</h1></div>';
       $.ajax({
         url: jaqen + '/query.html?' + $.param({_responseBody: html}),
-        type: 'POST',
+        method: 'POST',
         dataType: 'iframe html'
       }).done(function(data){
         assert.ok(!!$(data).find('h1').length, 'Should parse "html".');
@@ -59,7 +59,7 @@
       $.ajax({
         // Request as text so IE doesn't display a download dialog.
         url: jaqen + '/query.txt?' + $.param(json),
-        type: 'POST',
+        method: 'POST',
         dataType: 'iframe json'
       }).done(function(data){
         assert.deepEqual(data, json, 'Should parse "json".');
@@ -75,7 +75,7 @@
       var xml = '<?xml version="1.0"?><article><title>Lorem Ipsum</title></article>';
       $.ajax({
         url: jaqen + '/query.xml?' + $.param({_responseBody: xml}),
-        type: 'POST',
+        method: 'POST',
         dataType: 'iframe xml'
       }).done(function(data){
         assert.ok(!!$(data).find('title').length, 'Should parse "xml".');
@@ -87,23 +87,23 @@
     });
 
     QUnit.asyncTest('Send data.', function( assert ) {
-      expect( 1 );
+      expect(1);
 
       var article = {
-        title: 'Chronicles of Lorem Ipsum',
+        title:  'Chronicles of Lorem Ipsum',
         author: 'John Dow',
-        body: 'Lorem ipsum dolor sit amet.'
+        body:   'Lorem ipsum dolor sit amet.'
       };
 
       $.ajax({
         // Request as text so IE doesn't display a download dialog.
         url: jaqen + '/echo.txt',
-        type: 'POST',
+        method: 'POST',
         dataType: 'iframe json',
         data: article
       }).done(function(data){
-        delete data['X-HTTP-Accept'];
         delete data['X-Requested-With'];
+        delete data['Accept'];
         assert.deepEqual(data, article, 'Should send data.');
         QUnit.start();
       }).fail(function(error){
@@ -111,5 +111,57 @@
         QUnit.start();
       });
     });
+
+    QUnit.asyncTest('Pass custom headers as metadata.', function(assert) {
+      expect(3);
+
+      var headers = {
+        'X-Requested-With': 'Bifrost',  // Should overwrite the default one
+        'Bifrost-Version':  '1.0.2',
+        'Bifrost-Method':   'IFrame'
+      };
+
+      $.ajax({
+        url: jaqen + '/echo.json',
+        method: 'POST',
+        headers: headers,
+        dataType: 'iframe json'
+      }).done(function(data){
+        for (var header in headers) {
+          var message = 'Should contain the "' + header + '" header.'
+          assert.equal(headers[header], data[header], message);
+        }
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed (custom headers).');
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('No headers.', function( assert ) {
+      expect(1);
+
+      var article = {
+        title:  'Chronicles of Lorem Ipsum',
+        author: 'John Dow',
+        body:   'Lorem ipsum dolor sit amet.'
+      };
+
+      $.ajax({
+        // Request as text so IE doesn't display a download dialog.
+        url: jaqen + '/echo.txt',
+        method: 'POST',
+        headers: false,
+        dataType: 'iframe json',
+        data: article
+      }).done(function(data){
+        assert.deepEqual(data, article, 'Shouldn\'t contain metadata.');
+        QUnit.start();
+      }).fail(function(error){
+        assert.ok(false, 'Request failed.');
+        QUnit.start();
+      });
+    });
+
   </script>
 </body>

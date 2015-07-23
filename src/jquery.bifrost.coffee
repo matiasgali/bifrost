@@ -1,8 +1,8 @@
 ###
- * jQuery Bifröst v1.0.1
+ * jQuery Bifröst v1.0.2
  * http://matiasgagliano.github.com/bifrost/
  *
- * Copyright 2014, Matías Gagliano.
+ * Copyright 2014, Matías A. Gagliano.
  * Dual licensed under the MIT or GPLv3 licenses.
  * http://opensource.org/licenses/MIT
  * http://opensource.org/licenses/GPL-3.0
@@ -31,14 +31,20 @@ class Bifrost
 
 
   send: (headers, completeCallback) ->
-    options = @options
-    meta = {'X-Requested-With': 'IFrame'}
-    meta['X-HTTP-Accept'] = options.accepts if options.accepts?
+    options  = @options
+    dataType = options.dataTypes[1]
+
+    # Metadata (pass headers as metadata)
+    meta = if options.headers is false then false else {}
+    if meta
+      meta['X-Requested-With'] = 'IFrame'
+      meta['Accept']  = options.accepts[dataType]
+      meta['Accept'] += ', */*; q=0.01' unless dataType is '*'
 
     # RESTful API
-    if options.type in ['DELETE', 'PUT', 'PATCH']
-      meta['_method'] = options.type
-      options.type = 'POST'
+    if options.method in ['DELETE', 'PUT', 'PATCH']
+      meta['_method'] = options.method if meta
+      options.method = 'POST'
 
     # Iframe
     iframeId++
@@ -64,7 +70,7 @@ class Bifrost
 
     # Form
     form = @form = $('<form>').css('display', 'none')
-    form.prop target: iframeName, action: options.url, method: options.type
+    form.prop target: iframeName, action: options.url, method: options.method
     form.appendTo document.body
 
     # Process data
@@ -77,7 +83,10 @@ class Bifrost
         else if $.isArray(o[name]) then o[name].push value  # For checkboxes
         else o[name] = [ o[name], value ]
       data = o
-    data = $.extend {}, meta, data
+
+    # Add metadata (unless `headers` option is set to false).
+    # Custom `headers` should overwrite the built in metadata.
+    data = $.extend {}, meta, (options.headers or {}), data if meta
 
     # Text inputs
     for name,value of data
@@ -86,7 +95,7 @@ class Bifrost
     # File inputs
     fileInputs = $(options.fileInputs)
     clones = $()
-    if options.type is 'POST' and fileInputs.length
+    if options.method is 'POST' and fileInputs.length
       form.prop enctype: 'multipart/form-data', encoding: 'multipart/form-data'
       # Leave clones as markers
       clones = fileInputs.clone().prop('disabled', true)
@@ -117,7 +126,7 @@ $.ajaxTransport 'iframe', (options, originalOptions, jqXHR) ->
   new Bifrost(options, originalOptions, jqXHR) if options.async
 
 
-# Set convertes (data type conversion strategies used by $.ajax).
+# Set converters (data type conversion strategies used by $.ajax).
 # The keys format is 'source_type destination_type', single space in-between.
 #
 # Notes:
