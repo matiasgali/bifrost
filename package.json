@@ -1,0 +1,36 @@
+{
+  "name": "jquery-bifrost",
+  "version": "1.0.2",
+  "description": "A jQuery Ajax transport that uses an iframe to asynchronously send files and data even if FormData, the File API and XMLHttpRequest aren't supported.",
+  "author": "Matías A. Gagliano",
+  "license": "(GPL-3.0 OR MIT)",
+  "homepage": "https://github.com/matiasgagliano/bifrost",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matiasgagliano/bifrost"
+  },
+  "bugs": {
+    "url": "https://github.com/matiasgagliano/bifrost/issues"
+  },
+  "keywords": [
+    "jquery",
+    "jquery-plugin",
+    "ajax",
+    "transport",
+    "hidden",
+    "iframe",
+    "asynchronous",
+    "file",
+    "data"
+  ],
+  "files": [
+    "js",
+    "src",
+    "tests",
+    "README.md"
+  ],
+  "main": "js/jquery.bifrost.js",
+  "dependencies": {
+    "jquery": ">= 1.8.0"
+  }
+}

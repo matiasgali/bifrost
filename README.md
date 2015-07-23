@@ -1,6 +1,8 @@
 jQuery Bifröst
 ==============
 
+[![NPM](https://nodei.co/npm/jquery-bifrost.png?mini=true)](https://npmjs.org/package/jquery-bifrost)
+
 A [jQuery Ajax transport](//api.jquery.com/jQuery.ajaxTransport) that uses
 the *hidden iframe technique* to make **asynchronous requests**, allowing to
 send both *files* and *data* even from browsers that don't support *FormData*,
